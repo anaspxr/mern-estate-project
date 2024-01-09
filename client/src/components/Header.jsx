@@ -6,11 +6,11 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   return (
     <header className="bg-green-200 shadow-md">
-      <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
+      <div className="flex justify-between items-center mx-auto p-3">
         <Link to="/">
-          <h1 className="font-bold text-sm sm:text-xl flex-wrap">
-            <span className="text-green-600">Resorts</span>
-            <span className="text-green-800">Find</span>
+          <h1 className="font-bold text-sm sm:text-3xl flex-wrap">
+            <span className="text-green-600">Serene</span>
+            <span className="text-green-800">Spots</span>
           </h1>
         </Link>
         <form className="bg-green-100 p-3 rounded-lg flex items-center">
