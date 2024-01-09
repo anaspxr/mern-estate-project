@@ -72,7 +72,7 @@ export default function signIn() {
       <div>
         <p className="text-center mt-5">
           Do not have an account?{" "}
-          <a href="/sign-up" className="text-green-700">
+          <a href="/sign-up" className="text-green-700 underline">
             sign Up
           </a>
         </p>
