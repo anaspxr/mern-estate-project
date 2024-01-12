@@ -18,6 +18,17 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
 
+  const usernameInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+
+  const handleUsernameCLick = () => {
+    if (usernameInputRef.current) usernameInputRef.current.focus();
+  };
+
+  const handleEmailClick = () => {
+    if (emailInputRef.current) emailInputRef.current.focus();
+  };
+
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -59,15 +70,22 @@ export default function Profile() {
           accept="image/*"
           ref={fileRef}
         />
-        <img
-          onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
-          alt="profile"
-          className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
-        />
+        <div className="flex flex-col self-center">
+          <img
+            onClick={() => fileRef.current.click()}
+            src={formData.avatar || currentUser.avatar}
+            alt="profile"
+            className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
+          />
+
+          <p onClick={handleUsernameCLick} className="text-green-900 mx-auto cursor-pointer">{currentUser.username}</p>
+          <p onClick={handleEmailClick} className="text-green-900 mx-auto cursor-pointer">Email:{currentUser.email}</p>
+        </div>
         <p className="self-center text-sm">
           {fileUploadError ? (
-            <span className="text-red-700">Upload error (Image must be less than 2mb)</span>
+            <span className="text-red-700">
+              Upload error (Image must be less than 2mb)
+            </span>
           ) : filePercent > 0 && filePercent < 100 ? (
             <span className="text-green-700">Uploading {filePercent}%</span>
           ) : filePercent === 100 ? (
@@ -76,13 +94,16 @@ export default function Profile() {
             ""
           )}
         </p>
+
         <input
+        ref={usernameInputRef}
           type="text"
           placeholder="username"
           className="border p-3 rounded-lg"
           id="username"
         />
         <input
+        ref={emailInputRef}
           type="email"
           placeholder="email"
           className="border p-3 rounded-lg"
