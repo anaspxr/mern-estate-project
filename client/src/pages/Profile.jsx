@@ -9,6 +9,12 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/user.slice";
+import { useDispatch } from "react-redux";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -17,6 +23,7 @@ export default function Profile() {
   const [filePercent, setFilePercent] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
 
   const usernameInputRef = useRef(null);
   const emailInputRef = useRef(null);
@@ -59,10 +66,37 @@ export default function Profile() {
     );
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch("http://localhost:3000/api/user/update/65a22eff651c3795504f982b", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.error) {
+        dispatch(updateUserFailure(data.message));
+        return
+      }
+
+      dispatch(updateUserSuccess(data));
+
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold  text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           hidden
@@ -78,8 +112,18 @@ export default function Profile() {
             className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
           />
 
-          <p onClick={handleUsernameCLick} className="text-green-900 mx-auto cursor-pointer">{currentUser.username}</p>
-          <p onClick={handleEmailClick} className="text-green-900 mx-auto cursor-pointer">Email:{currentUser.email}</p>
+          <p
+            onClick={handleUsernameCLick}
+            className="text-green-900 mx-auto cursor-pointer"
+          >
+            {currentUser.username}
+          </p>
+          <p
+            onClick={handleEmailClick}
+            className="text-green-900 mx-auto cursor-pointer"
+          >
+            Email:{currentUser.email}
+          </p>
         </div>
         <p className="self-center text-sm">
           {fileUploadError ? (
@@ -96,24 +140,27 @@ export default function Profile() {
         </p>
 
         <input
-        ref={usernameInputRef}
+          ref={usernameInputRef}
           type="text"
           placeholder="username"
           className="border p-3 rounded-lg"
           id="username"
+          onChange={handleChange}
         />
         <input
-        ref={emailInputRef}
+          ref={emailInputRef}
           type="email"
           placeholder="email"
           className="border p-3 rounded-lg"
           id="email"
+          onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
           className="border p-3 rounded-lg"
           id="password"
+          onChange={handleChange}
         />
         <button className="bg-green-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
           Update
