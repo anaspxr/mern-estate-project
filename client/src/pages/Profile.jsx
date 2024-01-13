@@ -17,12 +17,13 @@ import {
 import { useDispatch } from "react-redux";
 
 export default function Profile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePercent, setFilePercent] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [updateSuccess, setUpdateSuccess] = useState(false);
   const dispatch = useDispatch();
 
   const usernameInputRef = useRef(null);
@@ -70,7 +71,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      const res = await fetch("http://localhost:3000/api/user/update/65a22eff651c3795504f982b", {
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,13 +79,13 @@ export default function Profile() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (data.error) {
+      if (data.success === false) {
         dispatch(updateUserFailure(data.message));
-        return
+        return;
       }
 
       dispatch(updateUserSuccess(data));
-
+      setUpdateSuccess(true);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
@@ -162,8 +163,8 @@ export default function Profile() {
           id="password"
           onChange={handleChange}
         />
-        <button className="bg-green-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-          Update
+        <button disabled={loading} className="bg-green-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
+          {loading ? "Updating..." : "update"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
@@ -174,6 +175,8 @@ export default function Profile() {
           Sign Out
         </span>
       </div>
+      <p className="text-red-700 mt-5">{error ? error : ""}</p>
+      <p className="text-green-700 mt-5">{updateSuccess ? "updated successfully!!" : ""}</p>
     </div>
   );
 }
