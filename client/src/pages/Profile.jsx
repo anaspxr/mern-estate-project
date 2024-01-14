@@ -13,6 +13,9 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/user.slice";
 import { useDispatch } from "react-redux";
 
@@ -94,6 +97,23 @@ export default function Profile() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold  text-center my-7">Profile</h1>
@@ -164,12 +184,18 @@ export default function Profile() {
           id="password"
           onChange={handleChange}
         />
-        <button disabled={loading} className="bg-green-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
+        <button
+          disabled={loading}
+          className="bg-green-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+        >
           {loading ? "Updating..." : "update"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer hover:underline">
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer hover:underline"
+        >
           Delete Account
         </span>
         <span className="text-red-700 cursor-pointer hover:underline">
@@ -177,7 +203,9 @@ export default function Profile() {
         </span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
-      <p className="text-green-700 mt-5">{updateSuccess ? "updated successfully!!" : ""}</p>
+      <p className="text-green-700 mt-5">
+        {updateSuccess ? "updated successfully!!" : ""}
+      </p>
     </div>
   );
 }
