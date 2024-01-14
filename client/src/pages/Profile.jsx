@@ -139,6 +139,7 @@ export default function Profile() {
             ""
           )}
         </p>
+        <h2 className="text-green-900 text-xl">Update Profile</h2>
 
         <input
           ref={usernameInputRef}
