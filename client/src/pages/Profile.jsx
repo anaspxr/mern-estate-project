@@ -22,7 +22,6 @@ import {
   signoutUserSuccess,
 } from "../redux/user/user.slice";
 import { useDispatch } from "react-redux";
-import { set } from "mongoose";
 
 export default function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
